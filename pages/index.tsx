@@ -2,7 +2,18 @@ import Head from 'next/head'
 import mesh from "react-three-fiber"
 import styles from '@/styles/Home.module.css'
 import { Canvas } from 'react-three-fiber'
+import { Suspense, useEffect, useRef } from "react";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { FBXLoader} from "three/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Environment, OrbitControls, useAnimations } from "@react-three/drei";
+import { useFBX,useGLTF } from '@react-three/drei';
+import * as THREE from "three";
 export default function Home() {
+  const group = useRef()
+  
+  useEffect(()=>{
+  },[])
   return (
     <>
       <Head>
@@ -11,15 +22,86 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-     <div className='bg-black w-full h-[100vh]'>
+     <div className='bg-white w-[100vw] h-[100vh]'>
       <Canvas>
-      <mesh scale={[1,2,1]} position={[1,2,-4]}>
-        <sphereGeometry args={[1.5,32,32]}/>
-        {/* <torusKnotGeometry /> */}
-        <meshNormalMaterial wireframe/>
-      </mesh>
+        {/* <Scene/> */}
+        <Suspense fallback={null}>
+        <ambientLight intensity={0.1} />
+        <directionalLight intensity={0.5}/>
+          <Box/>
+          {/* <Boxinner/> */}
+        <OrbitControls />
+        <mesh scale={0} position={[0,0,0]}>
+          <sphereGeometry args={[1.5,32,32]}/>
+          {/* <torusKnotGeometry /> */}
+          <meshNormalMaterial wireframe/>
+        </mesh>
+        </Suspense>
       </Canvas>
      </div>
     </>
   )
 }
+
+const Box = () =>{
+    const nodesloader = useLoader(GLTFLoader, 'glb1.glb')['nodes'];
+    const glb = useGLTF("glb3.glb");
+    const ref = useRef()
+    
+    
+    const {actions} = useAnimations(glb.animations,ref)
+    // const mixer = new THREE.AnimationMixer(glb)
+    // void mixer.clipAction(glb.animations[0]).play();
+    useFrame((state, delta) => {
+      // mixer.update(delta);
+    });
+    useEffect(()=>{
+      console.log(glb)
+      console.log(actions)
+      actions["All Animations"]?.play()
+    })
+    return(
+    <>
+    <group scale={1} ref={ref} >
+        <primitive object={glb.nodes.OuterCube} />
+        <mesh castShadow receiveShadow geometry={glb.nodes.InnerCube.geometry} material={glb.materials.aiStandardSurface1} scale={1}>
+          {/* <primitive object={} /> */}
+        </mesh>
+    </group>
+    
+    </>
+    )
+}
+// const Boxinner = () =>{
+//   const nodesloader = useLoader(GLTFLoader, 'glb2.glb')['nodes'];
+//   const glb = useGLTF("glb2.glb");
+//   const ref2 = useRef()
+  
+  
+//   const {actions} = useAnimations(glb.animations,ref2)
+//   // const mixer = new THREE.AnimationMixer(glb)
+//   // void mixer.clipAction(glb.animations[0]).play();
+//   useFrame((state, delta) => {
+//     // mixer.update(delta);
+//   });
+//   useEffect(()=>{
+//     actions["All Animations"]?.play()
+//   })
+//   return(
+//   <>
+//   <mesh scale={1} ref={ref2}  >
+//       <primitive object={nodesloader.pCube1} />
+//   </mesh>
+  
+//   </>
+//   )
+// }
+
+// function Scene() {
+//   const gltf = useLoader(GLTFLoader, 'glb1.glb')
+//   return (
+//     <Suspense fallback={null}>
+//       <primitive object={gltf.scene} />
+//     </Suspense>
+//   )
+// }
