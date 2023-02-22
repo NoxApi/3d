@@ -2,16 +2,23 @@ import Head from 'next/head'
 import mesh from "react-three-fiber"
 import styles from '@/styles/Home.module.css'
 import { Canvas } from 'react-three-fiber'
-import { Suspense, useEffect, useRef } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useFrame, useLoader,useThree } from "@react-three/fiber";
 import { FBXLoader} from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Environment, OrbitControls, useAnimations } from "@react-three/drei";
+import { Environment, Html, OrbitControls, TransformControls, useAnimations } from "@react-three/drei";
 import { useFBX,useGLTF } from '@react-three/drei';
 import * as THREE from "three";
+import { a } from "@react-spring/three";
+import { Vector3 } from 'three';
 export default function Home() {
   const group = useRef()
-  
+  const [ desination,setdestination] = useState(() => new THREE.Vector3(0,0,80))
+  const [items,setitems] = useState(0)
+  const set0 = () =>{
+    setdestination(() => new THREE.Vector3(0,0,80))
+    setitems(0)
+  }
   useEffect(()=>{
   },[])
   return (
@@ -22,18 +29,34 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-     <div className='bg-white w-[100vw] h-[100vh]'>
-      <Canvas>
+     <div className='bg-green-300 w-[100vw] h-[100vh] relative'>
+     <button onClick={()=>set0()} className='w-[60px] h-[60px] bg-black bg-opacity-50 flex justify-center items-end border-2 border-black rounded-full top-[1vw] right-[1vw] z-30 absolute'>
+                <p className='text-[50px] text-black mt-12'>{"x"}</p>
+      </button>
+      {items==1?(
+      <div className='w-[400px] h-[600px] absolute top-[300px] right-[300px] bg-black bg-opacity-60 rounded-3xl flex flex-col justify-start py-[50px] items-center'>
+        <p className='text-4xl text-yellow-500'>EVERMOON SAFE</p>
+        <div className='bg-yellow-500 h-[5px] w-[300px] mt-4'></div>
+        <p className='text-red-600 text-left text-xl px-[35px] mt-4 indent-[30px]'>{"safe that contain evermoon token and so much much much much much much much much much much much much much much much much much much much much much much much much  much much much much much much much much much much much much much much much much much much much much much much much much  more "}</p>
+      </div>):(null)}
+      {items==2?(
+      <div className='w-[400px] h-[600px] absolute top-[300px] left-[250px] bg-black bg-opacity-60 rounded-3xl flex flex-col justify-start py-[50px] items-center'>
+        <p className='text-4xl text-yellow-500'>EVERMOON BUILDER</p>
+        <div className='bg-yellow-500 h-[5px] w-[300px] mt-4'></div>
+        <p className='text-red-600 text-left text-xl px-[35px] mt-4 indent-[30px]'>{"The tool that build something we dont even know and dont even wanna know right? wrong you wanna know it and you wanna know it so bad that you read this kind of shitty random word to the end..."}</p>
+      </div>):(null)}
+      
+      <Canvas >
         {/* <Scene/> */}
         <Suspense fallback={null}>
-        <ambientLight intensity={0.1} />
-        <directionalLight intensity={0.5}/>
-          <Box/>
-          {/* <Boxinner/> */}
-        <OrbitControls />
-        <mesh scale={0} position={[0,0,0]}>
+        <ambientLight intensity={1} />
+        <directionalLight intensity={2}/>
+          <Camera des={desination} setdes={setdestination} setitems={setitems}/>
+          
+        {/* <OrbitControls makeDefault={true}/> */}
+        <mesh scale={1} position={[0,0,0]}>
           <sphereGeometry args={[1.5,32,32]}/>
-          {/* <torusKnotGeometry /> */}
+          <torusKnotGeometry />
           <meshNormalMaterial wireframe/>
         </mesh>
         </Suspense>
@@ -43,65 +66,142 @@ export default function Home() {
   )
 }
 
-const Box = () =>{
-    const nodesloader = useLoader(GLTFLoader, 'glb1.glb')['nodes'];
-    const glb = useGLTF("glb3.glb");
+const Safe = () =>{
+    const glb = useGLTF("safe.glb");
     const ref = useRef()
-    
-    
     const {actions} = useAnimations(glb.animations,ref)
     // const mixer = new THREE.AnimationMixer(glb)
     // void mixer.clipAction(glb.animations[0]).play();
     useFrame((state, delta) => {
-      // mixer.update(delta);
     });
     useEffect(()=>{
       console.log(glb)
       console.log(actions)
-      actions["All Animations"]?.play()
+      actions.Safe_safe_door_Anim_0?.play()
     })
     return(
     <>
-    <group scale={1} ref={ref} >
-        <primitive object={glb.nodes.OuterCube} />
-        <mesh castShadow receiveShadow geometry={glb.nodes.InnerCube.geometry} material={glb.materials.aiStandardSurface1} scale={1}>
-          {/* <primitive object={} /> */}
-        </mesh>
+    <group ref={ref} position={[0,-19.5,-24.53]} >
+      <mesh scale={1}>
+        <primitive object={glb.nodes.Main} />
+      </mesh>
     </group>
     
     </>
     )
 }
-// const Boxinner = () =>{
-//   const nodesloader = useLoader(GLTFLoader, 'glb2.glb')['nodes'];
-//   const glb = useGLTF("glb2.glb");
-//   const ref2 = useRef()
-  
-  
-//   const {actions} = useAnimations(glb.animations,ref2)
-//   // const mixer = new THREE.AnimationMixer(glb)
-//   // void mixer.clipAction(glb.animations[0]).play();
-//   useFrame((state, delta) => {
-//     // mixer.update(delta);
-//   });
-//   useEffect(()=>{
-//     actions["All Animations"]?.play()
-//   })
-//   return(
-//   <>
-//   <mesh scale={1} ref={ref2}  >
-//       <primitive object={nodesloader.pCube1} />
-//   </mesh>
-  
-//   </>
-//   )
-// }
 
-// function Scene() {
-//   const gltf = useLoader(GLTFLoader, 'glb1.glb')
-//   return (
-//     <Suspense fallback={null}>
-//       <primitive object={gltf.scene} />
-//     </Suspense>
-//   )
-// }
+const Build = () =>{
+  const glb1 = useGLTF("build/1.glb");
+  const glb2 = useGLTF("build/2.glb");
+  const glb3 = useGLTF("build/3.glb");
+  const glb4 = useGLTF("build/4.glb");
+  const glb5 = useGLTF("build/5.glb");
+  const glb6 = useGLTF("build/6.glb");
+  const ref1 = useRef()
+  const ref2 = useRef()
+  const ref3 = useRef()
+  const ref4 = useRef()
+  const ref5 = useRef()
+  const ref6 = useRef()
+  const animate2 = useAnimations(glb2.animations,ref2)
+  const animate3 = useAnimations(glb3.animations,ref3)
+  const animate4 = useAnimations(glb4.animations,ref4)
+  const animate5 = useAnimations(glb5.animations,ref5)
+  const animate6 = useAnimations(glb6.animations,ref6)
+  // const mixer = new THREE.AnimationMixer(glb)
+  // void mixer.clipAction(glb.animations[0]).play();
+  useFrame((state, delta) => {
+    // mixer.update(delta);
+  });
+  useEffect(()=>{
+    // console.log(glb2)
+    console.log(animate6)
+    animate2.actions.Building_ArmRotor_Animate_Anim_0?.play()
+    animate3.actions.Building_LowerRotor_Animate_Anim_0?.play()
+    animate4.actions.Building_UpperRotor_Animate_Anim_0?.play()
+    animate5.actions.Building_Sphere_Animate_Anim_0?.play()
+    animate6.actions.Building_Cylinder_Animate__2__Anim_0?.play()
+    
+    
+  })
+  return(
+  <>
+  <perspectiveCamera position={[0,0,10]}/>
+  <group ref={ref1} position={[0,-24,3 ]} rotation={[0,0,0]} >
+    <mesh >
+      <primitive object={glb1.nodes.Main} />
+    </mesh>
+    <mesh ref={ref2}>
+      <primitive object={glb2.nodes.Main} />
+    </mesh>
+    <mesh ref={ref3}>
+      <primitive object={glb3.nodes.Main} />
+    </mesh>
+    <mesh ref={ref4}>
+      <primitive object={glb4.nodes.Main} />
+    </mesh>
+    <mesh ref={ref5}>
+      <primitive object={glb5.nodes.Main} />
+    </mesh>
+    <mesh ref={ref6}>
+      <primitive object={glb6.nodes.Main} />
+    </mesh>
+  </group>
+  {/* <TransformControls ref={ref1}/> */}
+  </>
+  )
+}
+const Camera = ({
+  des,
+  setdes,
+  setitems
+}:
+{
+  des:any,
+  setdes:any
+  setitems:any
+}) => {
+  const [ smoothedCameraPosition ] = useState(() => new THREE.Vector3(0,0,25))
+
+  const movetosafe= () =>{
+    setdes(() => new THREE.Vector3(8.5,4,70))
+    setitems(1)
+  }
+  const movetobuild= () =>{
+    setdes(() => new THREE.Vector3(0,4,70))
+    setitems(2)
+  }
+  const camera = useRef();
+  useFrame((state, delta) => {
+    smoothedCameraPosition.lerp(des, 0.07)
+    state.camera.position.copy(smoothedCameraPosition)
+  });
+  return (
+    <perspectiveCamera
+      ref={camera}
+      fov={75}
+      near={0.1}
+      position={new THREE.Vector3(0,0,50)}
+      far={100}
+    > 
+      <mesh rotation={[0,(Math.PI/180)*230,0]}>
+      <Safe/>
+      </mesh>
+      <mesh rotation={[0,(Math.PI/180)*230,0]} position={[-8,0,0]}>
+      <Build/>
+      </mesh>
+      <Html position={[-2,6,6]} distanceFactor={20}>
+              <button onClick={()=>movetobuild()} className='w-[100px] h-[100px] bg-black bg-opacity-50 flex justify-center items-center border-2 border-black rounded-full'>
+                <p className='text-[50px] text-black text-center'>{"1"}</p>
+              </button>
+          </Html>
+          <Html position={[6,6,6.2]} distanceFactor={20}>
+              <button onClick={()=>movetosafe()} className='w-[100px] h-[100px] bg-black bg-opacity-50 flex justify-center items-center border-2 border-black rounded-full'>
+                <p className='text-[50px] text-black text-center'>{"2"}</p>
+              </button>
+          </Html>
+    </perspectiveCamera>
+  );
+};
+
